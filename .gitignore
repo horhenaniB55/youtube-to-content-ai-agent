@@ -1,0 +1,12 @@
+node_modules/
+.env
+*.log
+.DS_Store
+dist/
+build/
+.aws-sam/
+
+# Ignore all markdown files except README
+*.md
+!README.md
+.kiro/
