@@ -5,8 +5,13 @@ import { storeBlog, getBlog, uploadThumbnail } from '../services/storageService.
 import { generateHTML, generateMarkdown } from '../utils/formatters.js';
 
 // Main handler for blog generation
-export async function generateBlogHandler(youtubeUrl) {
+export async function generateBlogHandler(youtubeUrl, geminiApiKey) {
   try {
+    // Validate Gemini API key
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key is required');
+    }
+
     // Extract video ID
     const videoId = extractVideoId(youtubeUrl);
     console.log('Processing video:', videoId);
@@ -32,15 +37,16 @@ export async function generateBlogHandler(youtubeUrl) {
     console.log('Fetching transcript...');
     const transcript = await fetchTranscript(videoId);
 
-    // AI processing
+    // AI processing with user's API key
     console.log('Detecting category...');
-    const categoryResult = await detectCategory(metadata, transcript);
+    const categoryResult = await detectCategory(metadata, transcript, geminiApiKey);
     
     console.log('Generating blog content...');
     const blogContent = await generateBlogContent(
       categoryResult.category,
       metadata,
-      transcript
+      transcript,
+      geminiApiKey
     );
 
     // Upload thumbnail
@@ -74,7 +80,7 @@ export async function generateBlogHandler(youtubeUrl) {
 export async function handler(event) {
   try {
     const body = JSON.parse(event.body || '{}');
-    const { youtubeUrl } = body;
+    const { youtubeUrl, geminiApiKey } = body;
 
     if (!youtubeUrl) {
       return {
@@ -83,7 +89,14 @@ export async function handler(event) {
       };
     }
 
-    const result = await generateBlogHandler(youtubeUrl);
+    if (!geminiApiKey) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'geminiApiKey is required' })
+      };
+    }
+
+    const result = await generateBlogHandler(youtubeUrl, geminiApiKey);
 
     return {
       statusCode: 200,

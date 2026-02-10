@@ -10,3 +10,12 @@ build/
 *.md
 !README.md
 .kiro/
+
+# Deployment files
+*.sh
+deploy/
+function.zip
+
+# Secrets and credentials
+service-account-key.json
+*-key.json

@@ -1,14 +1,20 @@
-import { youtube } from '@googleapis/youtube';
+import { google } from 'googleapis';
 import { YoutubeTranscript } from 'youtube-transcript';
 import { config } from '../config/settings.js';
 import { parseDuration } from '../utils/validators.js';
 
-const youtubeClient = youtube({ version: 'v3', auth: config.youtube.apiKey });
+// Initialize YouTube client with service account
+const auth = new google.auth.GoogleAuth({
+  keyFile: config.youtube.serviceAccountKeyFile,
+  scopes: ['https://www.googleapis.com/auth/youtube.readonly']
+});
+
+const youtube = google.youtube({ version: 'v3', auth });
 
 // Fetch video metadata from YouTube Data API
 export async function fetchVideoMetadata(videoId) {
   try {
-    const response = await youtubeClient.videos.list({
+    const response = await youtube.videos.list({
       part: ['snippet', 'contentDetails', 'statistics'],
       id: [videoId]
     });

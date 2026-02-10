@@ -1,20 +1,24 @@
 import { generateObject } from 'ai';
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { config } from '../config/settings.js';
 import { CategoryClassificationSchema, getCategorySchema } from '../schemas/blogSchemas.js';
 
-const model = google(config.gemini.model);
-
 // Stage 1: Detect video category
-export async function detectCategory(metadata, transcript) {
-  const prompt = `Analyze this YouTube video and classify it into one of these categories: tutorial, review, educational, news, or entertainment.
+export async function detectCategory(metadata, transcript, geminiApiKey) {
+  const google = createGoogleGenerativeAI({ apiKey: geminiApiKey });
+  const model = google(config.gemini.model);
+  
+  const prompt = `Classify this YouTube video into ONE of these categories: tutorial, review, educational, news, or entertainment.
 
 Video Title: ${metadata.title}
 Channel: ${metadata.channel}
 Description: ${metadata.description}
 ${transcript ? `Transcript Preview: ${transcript.substring(0, 500)}...` : 'No transcript available'}
 
-Provide your classification with confidence score and reasoning.`;
+Return ONLY these three fields in JSON format:
+- category: one of "tutorial", "review", "educational", "news", or "entertainment"
+- confidence_score: a number between 0 and 1
+- reasoning: brief explanation for your classification`;
 
   try {
     const result = await generateObject({
@@ -37,27 +41,51 @@ Provide your classification with confidence score and reasoning.`;
 }
 
 // Stage 2: Generate blog content
-export async function generateBlogContent(category, metadata, transcript) {
+export async function generateBlogContent(category, metadata, transcript, geminiApiKey) {
+  const google = createGoogleGenerativeAI({ apiKey: geminiApiKey });
+  const model = google(config.gemini.model);
+  
   const categoryPrompts = {
-    tutorial: 'Create a tutorial blog post with clear prerequisites, step-by-step instructions, and key takeaways.',
-    review: 'Write a review blog post with pros, cons, a verdict, and a rating score out of 10.',
-    educational: 'Write an educational blog post with concept explanations, examples, and a summary.',
-    news: 'Create a news blog post with context, main points, analysis, and implications.',
-    entertainment: 'Write an entertainment blog post with highlights, memorable moments, and a conclusion.'
+    tutorial: {
+      instruction: 'Create a tutorial blog post with prerequisites, step-by-step instructions, and key takeaways.',
+      structure: 'prerequisites (array), steps (array of {title, description}), key_takeaways (array)'
+    },
+    review: {
+      instruction: 'Write a review blog post with pros, cons, verdict, and rating.',
+      structure: 'pros (array), cons (array), verdict (string), rating_score (number 0-10)'
+    },
+    educational: {
+      instruction: 'Write an educational blog post with concept explanation, examples, and summary.',
+      structure: 'concept_explanation (string), examples (array), summary (string)'
+    },
+    news: {
+      instruction: 'Create a news blog post with context, main points, analysis, and implications.',
+      structure: 'context (string), main_points (array), analysis (string), implications (string)'
+    },
+    entertainment: {
+      instruction: 'Write an entertainment blog post with highlights, memorable moments, and conclusion.',
+      structure: 'highlights (array), memorable_moments (array), conclusion (string)'
+    }
   };
 
-  const prompt = `${categoryPrompts[category]}
+  const categoryInfo = categoryPrompts[category] || categoryPrompts.entertainment;
+
+  const prompt = `${categoryInfo.instruction}
 
 Video Title: ${metadata.title}
 Channel: ${metadata.channel}
 Description: ${metadata.description}
-${transcript ? `Full Transcript: ${transcript}` : 'Generate content based on title and description only.'}
+Thumbnail: ${metadata.thumbnailUrl}
+Published: ${metadata.publishDate}
+Views: ${metadata.viewCount}
+Duration: ${metadata.duration}
+${transcript ? `Transcript: ${transcript.substring(0, 2000)}...` : 'No transcript available'}
 
-Create engaging blog content with:
-- A compelling introduction
-- Detailed body content
-- A strong conclusion
-- Proper media references and credits`;
+Return a JSON object with:
+- videoMetadata: {title, channel, thumbnailUrl, publishDate, viewCount, duration}
+- contentSections: {introduction, body, conclusion}
+- categoryContent: {${categoryInfo.structure}}
+- mediaReferences: {thumbnail, credits}`;
 
   try {
     const schema = getCategorySchema(category);
@@ -74,7 +102,7 @@ Create engaging blog content with:
     console.log('Blog generation complete');
     console.log('Token usage:', result.usage);
     
-    return result.object;
+    return Array.isArray(result.object) ? result.object[0] : result.object;
   } catch (error) {
     console.error('Error generating blog:', error);
     throw error;

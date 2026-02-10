@@ -5,8 +5,13 @@
   "type": "module",
   "main": "src/handlers/apiHandler.js",
   "scripts": {
-    "dev": "node src/handlers/apiHandler.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js",
+    "test:categories": "node test-categories.js",
+    "test:tutorial": "node test-categories.js tutorial",
+    "test:review": "node test-categories.js review",
+    "test:educational": "node test-categories.js educational",
+    "test:news": "node test-categories.js news",
+    "test:entertainment": "node test-categories.js entertainment"
   },
   "keywords": [
     "youtube",
@@ -22,7 +27,9 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "^3.0.39",
     "@ai-sdk/google": "^3.0.22",
+    "@ai-sdk/provider-utils": "^4.0.14",
     "@aws-sdk/client-dynamodb": "^3.985.0",
     "@aws-sdk/client-s3": "^3.985.0",
     "@aws-sdk/client-secrets-manager": "^3.985.0",
@@ -30,6 +37,8 @@
     "@googleapis/youtube": "^31.0.0",
     "ai": "^6.0.77",
     "axios": "^1.13.5",
+    "dotenv": "^17.2.4",
+    "googleapis": "^171.4.0",
     "youtube-transcript": "^1.2.1",
     "zod": "^4.3.6"
   }
