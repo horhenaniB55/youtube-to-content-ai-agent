@@ -1,6 +1,7 @@
 // Generate HTML from blog object
 export function generateHTML(blogData) {
   const { videoMetadata, contentSections, categoryContent } = blogData;
+  const youtubeUrl = `https://www.youtube.com/watch?v=${videoMetadata.videoId}`;
   
   return `<!DOCTYPE html>
 <html lang="en">
@@ -21,6 +22,7 @@ export function generateHTML(blogData) {
   <div class="meta">
     <p>Channel: ${videoMetadata.channel} | Views: ${videoMetadata.viewCount.toLocaleString()} | Duration: ${videoMetadata.duration}</p>
     <p>Published: ${new Date(videoMetadata.publishDate).toLocaleDateString()}</p>
+    <p><a href="${youtubeUrl}" target="_blank">Watch on YouTube</a></p>
   </div>
   <img src="${videoMetadata.thumbnailUrl}" alt="Video thumbnail">
   <div class="section">
@@ -42,13 +44,15 @@ export function generateHTML(blogData) {
 // Generate Markdown from blog object
 export function generateMarkdown(blogData) {
   const { videoMetadata, contentSections } = blogData;
+  const youtubeUrl = `https://www.youtube.com/watch?v=${videoMetadata.videoId}`;
   
   return `# ${videoMetadata.title}
 
 **Channel:** ${videoMetadata.channel}  
 **Views:** ${videoMetadata.viewCount.toLocaleString()}  
 **Duration:** ${videoMetadata.duration}  
-**Published:** ${new Date(videoMetadata.publishDate).toLocaleDateString()}
+**Published:** ${new Date(videoMetadata.publishDate).toLocaleDateString()}  
+**Watch:** [${youtubeUrl}](${youtubeUrl})
 
 ![Video Thumbnail](${videoMetadata.thumbnailUrl})
 
