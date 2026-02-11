@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>YouTube to Blog AI Agent</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>🎥 YouTube to Blog AI</h1>
+                <p>
+                    Convert YouTube videos into structured blog posts using AI
+                </p>
+            </header>
+
+            <main>
+                <section class="input-section">
+                    <form id="blogForm">
+                        <div class="form-group">
+                            <label for="apiKey">
+                                Gemini API Key
+                                <a
+                                    href="https://aistudio.google.com/app/apikey"
+                                    target="_blank"
+                                    class="help-link"
+                                    >Get API Key</a
+                                >
+                            </label>
+                            <input
+                                type="password"
+                                id="apiKey"
+                                placeholder="Enter your Gemini API key"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="youtubeUrl">YouTube URL</label>
+                            <input
+                                type="text"
+                                id="youtubeUrl"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            id="generateBtn"
+                            class="btn-primary"
+                        >
+                            <span class="btn-text">Generate Blog Post</span>
+                            <span class="btn-loader" style="display: none">
+                                <span class="spinner"></span> Generating...
+                            </span>
+                        </button>
+                    </form>
+
+                    <div id="statusMessage" class="status-message"></div>
+                </section>
+
+                <section
+                    class="output-section"
+                    id="outputSection"
+                    style="display: none"
+                >
+                    <div class="video-info" id="videoInfo"></div>
+
+                    <div class="preview-header">
+                        <button class="btn-copyhtml" onclick="copyHTML()">
+                            Copy HTML
+                        </button>
+                        <button
+                            class="btn-copymarkdown"
+                            onclick="copyMarkdown()"
+                        >
+                            Copy Markdown
+                        </button>
+                    </div>
+
+                    <div id="htmlContent" class="html-preview"></div>
+                </section>
+            </main>
+
+            <footer>
+                <p>
+                    Powered by
+                    <a href="https://ai.google.dev/" target="_blank"
+                        >Google Gemini</a
+                    >
+                    |
+                    <a
+                        href="https://github.com/horhenaniB55/youtube-to-content-ai-agent"
+                        target="_blank"
+                        >View on GitHub</a
+                    >
+                </p>
+            </footer>
+        </div>
+
+        <script src="app.js"></script>
+    </body>
+</html>
