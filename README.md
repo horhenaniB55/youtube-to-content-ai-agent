@@ -28,6 +28,12 @@ cp .env.example .env
 
 **Note:** This is a **Bring Your Own Key (BYOK)** system. Users must provide their own Gemini API key for AI generation.
 
+## Live Demo
+
+**Frontend**: http://youtube-blog-frontend-338394181752.s3-website-us-east-1.amazonaws.com
+
+Try it now with your own Gemini API key!
+
 ## Usage
 
 ### Basic Test
